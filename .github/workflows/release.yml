@@ -41,7 +41,7 @@ jobs:
 
     steps:
       - name: Install build tools
-        run: apk add --no-cache git make tar curl perl
+        run: apk add --no-cache git make tar curl perl coreutils dpkg
 
       - name: Checkout source
         uses: actions/checkout@v3
