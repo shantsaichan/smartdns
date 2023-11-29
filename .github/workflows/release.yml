@@ -29,20 +29,30 @@ jobs:
 
     steps:
       - name: Install build tools
-        run: apk add --no-cache git make tar openssl-dev
+        run: apk add --no-cache git make tar
 
       - name: Checkout source
         uses: actions/checkout@v3
         with:
           submodules: recursive
 
+      - name: Build openssl
+        run: |
+          export OPENSSL_VER=3.0.12
+          export OPENSSL_OPTIONS="no-tests no-ssl3 no-weak-ssl-ciphers no-shared no-idea -DOPENSSL_NO_SECURE_MEMORY"
+          mkdir -p /build/openssl
+          cd /build/openssl
+          curl -sSL https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz | tar --strip-components=1 -zxv
+          ./config --prefix=/opt/build $OPENSSL_OPTIONS
+          make all -j8
+          make install_sw
+
       - name: Build
         run: |
           cc -v
+          export EXTRA_CFLAGS="-I /opt/build/include"
+          export LDFLAGS="-L /opt/build/lib -L /opt/build/lib64"
           make STATIC=true
-
-      - name: Make executable
-        run: chmod +x bin/*
 
       - name: Set up directories
         run: |
