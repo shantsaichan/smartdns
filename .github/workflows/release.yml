@@ -79,7 +79,8 @@ jobs:
 
       - name: Create binary atrifacts
         run: |
-          cp package/smartdns.*.tar.gz .artifacts/
+          cp package/smartdns.*.* .artifacts/
+          cp package/luci-app-smartdns.* .artifacts/
           cp src/smartdns .artifacts/smartdns-${{ matrix.pkgarch }}
 
       - name: Upload artifacts
