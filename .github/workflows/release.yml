@@ -63,7 +63,7 @@ jobs:
         run: |
           cc -v
           export EXTRA_CFLAGS="-I /opt/build/include -DFEATURE_CHECK_EDNS=1"
-          export LDFLAGS="-L /opt/build/lib -L /opt/build/lib64 --whole-archive -latomic -Wl,--no-whole-archive"
+          export LDFLAGS="-L /opt/build/lib -L /opt/build/lib64 -Wl,--whole-archive -latomic -Wl,--no-whole-archive"
           ./package/build-pkg.sh --platform linux --arch ${{ matrix.pkgarch }}  --static
 
       - name: Set up directories
