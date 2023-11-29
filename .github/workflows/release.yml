@@ -51,7 +51,7 @@ jobs:
       - name: Build openssl
         run: |
           export OPENSSL_VER=3.0.12
-          export OPENSSL_OPTIONS="${{ matrix.openssl }} no-tests no-ssl3 no-weak-ssl-ciphers no-shared no-idea -DOPENSSL_NO_SECURE_MEMORY"
+          export OPENSSL_OPTIONS="${{ matrix.openssl }} no-tests no-ssl3 no-weak-ssl-ciphers no-shared no-idea -mno-outline-atomics -DOPENSSL_NO_SECURE_MEMORY"
           mkdir -p /build/openssl
           cd /build/openssl
           curl -sSL https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz | tar --strip-components=1 -zxv
@@ -73,10 +73,8 @@ jobs:
 
       - name: Create binary atrifacts
         run: |
-          TOOLCHAIN=${{ matrix.toolchain }}
-          GIT_HASH=$(git rev-parse --short "${{ github.sha }}")
-          FILENAME=btop-${TOOLCHAIN/linux-musl/}-$GIT_HASH
-          cp bin/btop .artifacts/$FILENAME
+          cp package/smartdns.*.tar.gz .artifacts/
+          cp src/smartdns .artifacts/smartdns-${{ matrix.pkgarch }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
