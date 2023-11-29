@@ -19,7 +19,7 @@ jobs:
         include:
           - toolchain: aarch64-linux-musl
             openssl: linux-aarch64
-            pkgarch: arch
+            pkgarch: aarch64
           - toolchain: arm-linux-musleabi
             openssl: linux-armv4
             pkgarch: arm
