@@ -16,27 +16,25 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        toolchain:
-          - aarch64-linux-musl
-          - arm-linux-musleabi
-          - mips-linux-musl
-          - mipsel-linux-musl
-          - i686-linux-musl
-          - x86_64-linux-musl
-        opensslarch:
-          - linux-aarch64
-          - linux-armv4
-          - linux-mips32
-          - linux-mips32
-          - linux-x86
-          - linux-x86_64
-        arch:
-          - aarch64
-          - arm
-          - mips
-          - mipsel
-          - x86
-          - x86_64
+        include:
+          - toolchain: aarch64-linux-musl,
+            openssl: linux-aarch64,
+            pkgarch: arch,
+          - toolchain: arm-linux-musleabi,
+            openssl: linux-armv4,
+            pkgarch: arm,
+          - toolchain: mips-linux-musl,
+            openssl: linux-mips32,
+            pkgarch: mips,
+          - toolchain: mipsel-linux-musl,
+            openssl: linux-mips32,
+            pkgarch: mipsel,
+          - toolchain: i686-linux-musl,
+            openssl: linux-x86,
+            pkgarch: x86,
+          - toolchain: x86_64-linux-musl,
+            openssl: linux-x86_64,
+            pkgarch: x86_64,
 
     runs-on: ubuntu-latest
     container: muslcc/x86_64:${{ matrix.toolchain }}
@@ -53,7 +51,7 @@ jobs:
       - name: Build openssl
         run: |
           export OPENSSL_VER=3.0.12
-          export OPENSSL_OPTIONS="${{ matrix.opensslarch }} no-tests no-ssl3 no-weak-ssl-ciphers no-shared no-idea -DOPENSSL_NO_SECURE_MEMORY"
+          export OPENSSL_OPTIONS="${{ matrix.openssl }} no-tests no-ssl3 no-weak-ssl-ciphers no-shared no-idea -DOPENSSL_NO_SECURE_MEMORY"
           mkdir -p /build/openssl
           cd /build/openssl
           curl -sSL https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz | tar --strip-components=1 -zxv
@@ -66,7 +64,7 @@ jobs:
           cc -v
           export EXTRA_CFLAGS="-I /opt/build/include"
           export LDFLAGS="-L /opt/build/lib -L /opt/build/lib64"
-          ./package/build-pkg.sh --platform linux --arch ${{ matrix.arch }}  --static
+          ./package/build-pkg.sh --platform linux --arch ${{ matrix.pkgarch }}  --static
 
       - name: Set up directories
         run: |
