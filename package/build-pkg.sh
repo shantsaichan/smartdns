@@ -170,11 +170,6 @@ main()
 		fi
 	fi
 
-	if [ ! -e "`which $CC`" ]; then
-		echo "Cannot find compiler $CC"
-		return 1
-	fi
-
 	build
 }
 
