@@ -1,11 +1,12 @@
-name: Release SmartDNS
+name: SmartDNS CI
 
 on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
   workflow_dispatch:
     inputs:
-      version:
-        description: 'new release tag(e.g. 38)'
-        required: true
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.ref }}
