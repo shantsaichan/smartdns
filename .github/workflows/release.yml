@@ -49,7 +49,7 @@ jobs:
           restore-keys: ${{ matrix.toolchain }}
           
       - name: Install build tools
-        run: apk add --no-cache git make tar curl perl coreutils dpkg
+        run: apk add --no-cache git make tar curl perl coreutils dpkg ccache
 
       - name: Checkout source
         uses: actions/checkout@v3
