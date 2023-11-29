@@ -61,13 +61,11 @@ jobs:
 
       - name: Build
         run: |
-          cc -v
           export EXTRA_CFLAGS="-I /opt/build/include -DFEATURE_CHECK_EDNS=1"
           export LDFLAGS="-L /opt/build/lib -L /opt/build/lib64 -Wl,--whole-archive -latomic -Wl,--no-whole-archive"
           ./package/build-pkg.sh --platform linux --arch ${{ matrix.pkgarch }}  --static
           ./package/build-pkg.sh --platform optware --arch ${{ matrix.pkgarch }}  --only-package
           ./package/build-pkg.sh --platform openwrt --arch ${{ matrix.pkgarch }}  --only-package
-          ./package/build-pkg.sh --platform debian --arch ${{ matrix.pkgarch }}  --only-package
           ./package/build-pkg.sh --platform debian --arch ${{ matrix.pkgarch }}  --only-package
           ./package/build-pkg.sh --platform luci --arch all --only-package
           ./package/build-pkg.sh --platform luci-compat --arch all --only-package
