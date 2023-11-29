@@ -17,24 +17,24 @@ jobs:
     strategy:
       matrix:
         include:
-          - toolchain: aarch64-linux-musl,
-            openssl: linux-aarch64,
-            pkgarch: arch,
-          - toolchain: arm-linux-musleabi,
-            openssl: linux-armv4,
-            pkgarch: arm,
-          - toolchain: mips-linux-musl,
-            openssl: linux-mips32,
-            pkgarch: mips,
-          - toolchain: mipsel-linux-musl,
-            openssl: linux-mips32,
-            pkgarch: mipsel,
-          - toolchain: i686-linux-musl,
-            openssl: linux-x86,
-            pkgarch: x86,
-          - toolchain: x86_64-linux-musl,
-            openssl: linux-x86_64,
-            pkgarch: x86_64,
+          - toolchain: aarch64-linux-musl
+            openssl: linux-aarch64
+            pkgarch: arch
+          - toolchain: arm-linux-musleabi
+            openssl: linux-armv4
+            pkgarch: arm
+          - toolchain: mips-linux-musl
+            openssl: linux-mips32
+            pkgarch: mips
+          - toolchain: mipsel-linux-musl
+            openssl: linux-mips32
+            pkgarch: mipsel
+          - toolchain: i686-linux-musl
+            openssl: linux-x86
+            pkgarch: x86
+          - toolchain: x86_64-linux-musl
+            openssl: linux-x86_64
+            pkgarch: x86_64
 
     runs-on: ubuntu-latest
     container: muslcc/x86_64:${{ matrix.toolchain }}
