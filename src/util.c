@@ -53,7 +53,6 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <unwind.h>
 
 #define TMP_BUFF_LEN_32 32
 
@@ -1419,11 +1418,45 @@ uint64_t get_free_space(const char *path)
 	return size;
 }
 
+#ifdef NO_UNWIND
+void print_stack(void)
+{
+	return;
+}
+#else
+#ifdef __USE_GNU
+#include <execinfo.h>
+void print_stack(void)
+{
+	void *buffer[128];
+	int idx = 0;
+	int frame_num = backtrace(buffer, 128);
+	if (frame_num == 0) {
+		return;
+	}
+
+	tlog(TLOG_FATAL, "Stack:");
+	for (idx = 0; idx < frame_num; ++idx) {
+		const void *addr = buffer[idx];
+		const char *symbol = "";
+
+		Dl_info info;
+		memset(&info, 0, sizeof(info));
+		if (dladdr(addr, &info) && info.dli_sname) {
+			symbol = info.dli_sname;
+		}
+
+		void *offset = (void *)((char *)(addr) - (char *)(info.dli_fbase));
+		tlog(TLOG_FATAL, "#%.2d: %p %s() from %s+%p", idx + 1, addr, symbol, info.dli_fname, offset);
+	}
+}
+
+#else
+#include <unwind.h>
 struct backtrace_state {
 	void **current;
 	void **end;
 };
-
 static _Unwind_Reason_Code unwind_callback(struct _Unwind_Context *context, void *arg)
 {
 	struct backtrace_state *state = (struct backtrace_state *)(arg);
@@ -1466,6 +1499,8 @@ void print_stack(void)
 		tlog(TLOG_FATAL, "#%.2d: %p %s() from %s+%p", idx + 1, addr, symbol, info.dli_fname, offset);
 	}
 }
+#endif
+#endif
 
 void bug_ext(const char *file, int line, const char *func, const char *errfmt, ...)
 {
@@ -1632,6 +1667,23 @@ errout:
 	return;
 }
 
+void daemon_close_stdfds(void)
+{
+	int fd_null = open("/dev/null", O_RDWR);
+	if (fd_null < 0) {
+		fprintf(stderr, "open /dev/null failed, %s\n", strerror(errno));
+		return;
+	}
+
+	dup2(fd_null, STDIN_FILENO);
+	dup2(fd_null, STDOUT_FILENO);
+	dup2(fd_null, STDERR_FILENO);
+
+	if (fd_null > 2) {
+		close(fd_null);
+	}
+}
+
 int daemon_kickoff(int status, int no_close)
 {
 	struct daemon_msg msg;
@@ -1650,19 +1702,7 @@ int daemon_kickoff(int status, int no_close)
 	}
 
 	if (no_close == 0) {
-		int fd_null = open("/dev/null", O_RDWR);
-		if (fd_null < 0) {
-			fprintf(stderr, "open /dev/null failed, %s\n", strerror(errno));
-			return -1;
-		}
-
-		dup2(fd_null, STDIN_FILENO);
-		dup2(fd_null, STDOUT_FILENO);
-		dup2(fd_null, STDERR_FILENO);
-
-		if (fd_null > 2) {
-			close(fd_null);
-		}
+		daemon_close_stdfds();
 	}
 
 	close(daemon_fd);
