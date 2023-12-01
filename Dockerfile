@@ -1,4 +1,4 @@
-FROM ubuntu:latest as smartdns-builder
+FROM debian:latest as smartdns-builder
 LABEL previous-stage=smartdns-builder
 
 # prepare builder
