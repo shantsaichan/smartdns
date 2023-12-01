@@ -13,7 +13,7 @@ RUN apt update && \
     cd /build/openssl && \
     curl -sSL https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz | tar --strip-components=1 -zxv && \
     \
-    musl-cc -v && \
+    musl-gcc -v && \
     uname -a && \
     \
     export CC="musl-gcc -static -idirafter /usr/include/ -idirafter /usr/include/$(uname -m)-linux-gnu" && \
