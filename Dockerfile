@@ -11,13 +11,14 @@ RUN apt update && \
     \
     mkdir -p /build/openssl && \
     cd /build/openssl && \
-    curl -sSL http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/openssl_${OPENSSL_VER}.orig.tar.gz | tar --strip-components=1 -zxv && \
+    curl -sSL https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz | tar --strip-components=1 -zxv && \
     \
-    export CC=musl-gcc && \
+    export CC="musl-gcc -static -idirafter /usr/include/ -idirafter /usr/include/$(uname -m)-linux-gnu" && \
+    export OPENSSL_OPTIONS="no-tests no-ssl3 no-weak-ssl-ciphers no-shared no-idea -DOPENSSL_NO_SECURE_MEMORY" && \
     if [ "$(uname -m)" = "aarch64" ]; then \
-        ./config --prefix=/opt/build no-tests -mno-outline-atomics ; \
+        ./config --prefix=/opt/build $OPENSSL_OPTIONS -mno-outline-atomics; \
     else \ 
-        ./config --prefix=/opt/build no-tests ; \
+        ./config --prefix=/opt/build $OPENSSL_OPTIONS; \
     fi && \
     make all -j8 && make install_sw && \
     cd / && rm -rf /build
@@ -26,8 +27,9 @@ RUN apt update && \
 COPY . /build/smartdns/
 RUN cd /build/smartdns && \
     export CC=musl-gcc && \
-    export CFLAGS="-I /opt/build/include" && \
+    export EXTRA_CFLAGS="-I /opt/build/include" && \
     export LDFLAGS="-L /opt/build/lib -L /opt/build/lib64" && \
+    export NOUNWIND=1 && \
     sh ./package/build-pkg.sh --platform linux --arch `dpkg --print-architecture` --static && \
     \
     ( cd package && tar -xvf *.tar.gz && chmod a+x smartdns/etc/init.d/smartdns ) && \
