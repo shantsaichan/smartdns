@@ -13,6 +13,9 @@ RUN apt update && \
     cd /build/openssl && \
     curl -sSL https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz | tar --strip-components=1 -zxv && \
     \
+    musl-cc -v && \
+    uname -a && \
+    \
     export CC="musl-gcc -static -idirafter /usr/include/ -idirafter /usr/include/$(uname -m)-linux-gnu" && \
     export OPENSSL_OPTIONS="no-tests no-ssl3 no-weak-ssl-ciphers no-shared no-idea -DOPENSSL_NO_SECURE_MEMORY" && \
     if [ "$(uname -m)" = "aarch64" ]; then \
