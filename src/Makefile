@@ -34,6 +34,9 @@ override CFLAGS += $(EXTRA_CFLAGS)
 ifdef VER
 override CFLAGS += -DSMARTDNS_VERION='"$(VER)"'
 endif
+ifdef NOUNWIND
+override CFLAGS += -DNO_UNWIND
+endif
 
 CXXFLAGS=-O2 -g -Wall -std=c++11 
 override CXXFLAGS +=-Iinclude
